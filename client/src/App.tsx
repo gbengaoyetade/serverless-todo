@@ -8,12 +8,12 @@ import { LogIn } from './components/LogIn'
 import { NotFound } from './components/NotFound'
 import { Todos } from './components/Todos'
 
-export interface AppProps {}
-
 export interface AppProps {
-  auth: Auth
+  auth: Auth,
   history: any
 }
+
+console.log(process.env)
 
 export interface AppState {}
 
