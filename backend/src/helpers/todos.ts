@@ -1,10 +1,21 @@
-import { TodosAccess } from './todosAcess'
-import { AttachmentUtils } from './attachmentUtils';
-import { TodoItem } from '../models/TodoItem'
-import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { createLogger } from '../utils/logger'
-import * as uuid from 'uuid'
-import * as createError from 'http-errors'
+import * as todosAccess from './todosAccess';
+import * as uuid from 'uuid';
+import { TodoItem } from '../models/TodoItem';
+import { CreateTodoRequest } from '../requests/CreateTodoRequest';
 
-// TODO: Implement businessLogic
+const s3BucketName = process.env.S3_BUCKET_NAME;
+
+export function createTodo(
+  createTodoRequest: CreateTodoRequest,
+  userId: string
+): Promise<TodoItem> {
+  const todoId = uuid.v4();
+  return todosAccess.createTodo({
+    userId,
+    todoId,
+    createdAt: new Date().getTime().toString(),
+    done: false,
+    attachmentUrl: `https://${s3BucketName}.s3.us-east-2.amazonaws.com/${todoId}`,
+    ...createTodoRequest,
+  });
+}
