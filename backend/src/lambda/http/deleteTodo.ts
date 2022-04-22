@@ -1,25 +1,34 @@
-// import 'source-map-support/register'
+import 'source-map-support/register';
 
-// import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-// import * as middy from 'middy'
-// import { cors, httpErrorHandler } from 'middy/middlewares'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  APIGatewayProxyHandler,
+} from 'aws-lambda';
+import { deleteTodo } from '../../helpers/todos';
+import { createLogger } from '../../utils/logger';
 
-// import { deleteTodo } from '../../businessLogic/todos'
-// import { getUserId } from '../utils'
+const logger = createLogger('auth');
 
-// export const handler = middy(
-//   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-//     const todoId = event.pathParameters.todoId
-//     // TODO: Remove a TODO item by id
+export const handler: APIGatewayProxyHandler = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  if (!(await deleteTodo(event))) {
+    logger.info('Item cannot be seen');
+    return {
+      statusCode: 404,
+      body: JSON.stringify({
+        error: 'Item does not exist',
+      }),
+    };
+  }
 
-//     return undefined
-//   }
-// )
-
-// handler
-//   .use(httpErrorHandler())
-//   .use(
-//     cors({
-//       credentials: true
-//     })
-//   )
+  return {
+    statusCode: 202,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
+    body: JSON.stringify({}),
+  };
+};

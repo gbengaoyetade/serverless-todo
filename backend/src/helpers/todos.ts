@@ -5,7 +5,7 @@ import { TodoItem } from '../models/TodoItem';
 import { CreateTodoRequest } from '../requests/CreateTodoRequest';
 import { getUserId } from '../lambda/utils';
 
-const s3BucketName = process.env.S3_BUCKET_NAME;
+const s3BucketName = process.env.S3_BUCKET;
 
 export async function createTodo(
   event: APIGatewayProxyEvent,
@@ -34,3 +34,10 @@ export const getTodos = async (event: APIGatewayProxyEvent) => {
 
   return await todosAccess.getTodos(userId);
 };
+
+export async function deleteTodo(event: APIGatewayProxyEvent) {
+  const todoId = event.pathParameters.todoId;
+  const userId = getUserId(event);
+
+  return await todosAccess.deleteTodo(todoId, userId);
+}

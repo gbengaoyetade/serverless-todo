@@ -51,3 +51,17 @@ export const getTodos = async (userId) => {
 
   return result.Items;
 };
+
+export const deleteTodo = async (todoId, userId) => {
+  const response = await docClient
+    .delete({
+      TableName: todosTable,
+      Key: {
+        todoId,
+        userId,
+      },
+    })
+    .promise();
+  console.log('Deleted', response.toString());
+  return true;
+};
