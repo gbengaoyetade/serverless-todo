@@ -10,6 +10,7 @@ const docClient: DocumentClient = new AWS.DynamoDB.DocumentClient();
 const s3Client = new XAWS.S3({ signatureVersion: 'v4' });
 const todosTable = process.env.TODOS_TABLE;
 const s3BucketName = process.env.S3_BUCKET_NAME;
+const userIdIndex = process.env.INDEX_NAME;
 
 export const generateUploadUrl = async (todoId: string): Promise<string> => {
   logger.info('Generating upload URL', todoId);
@@ -24,13 +25,29 @@ export const generateUploadUrl = async (todoId: string): Promise<string> => {
 };
 
 export const createTodo = async (todoItem: TodoItem): Promise<TodoItem> => {
+  logger.info(`creating todoItem ${todoItem.toString()}`);
   const params = {
     TableName: todosTable,
     Item: todoItem,
   };
 
   const result = await docClient.put(params).promise();
-  console.log(result);
+  logger.info(result);
 
   return todoItem as TodoItem;
+};
+
+export const getTodos = async (userId) => {
+  const result = await docClient
+    .query({
+      TableName: todosTable,
+      IndexName: userIdIndex,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: {
+        ':userId': userId,
+      },
+    })
+    .promise();
+
+  return result.Items;
 };
