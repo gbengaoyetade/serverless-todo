@@ -81,29 +81,27 @@ functions:
         Resource:
           - '*'
 
-  # UpdateTodo:
-  #   handler: src/lambda/http/updateTodo.handler
-  #   events:
-  #     - http:
-  #         method: patch
-  #         path: todos/{todoId}
-  #         cors: true
-  #         authorizer: Auth
-  #
-  #           requestModels:
-  #             'application/json': UpdateTodoRequest
-  #   iamRoleStatements:
-  #     - Effect: Allow
-  #       Action:
-  #         - dynamodb:UpdateItem
-  #         - dynamodb:GetItem
-  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-  #     - Effect: Allow
-  #       Action:
-  #         - xray:PutTraceSegments
-  #         - xray:PutTelemetryRecords
-  #       Resource:
-  #         - '*'
+  UpdateTodo:
+    handler: src/lambda/http/updateTodo.handler
+    events:
+      - http:
+          method: patch
+          path: todos/{todoId}
+          cors: true
+          authorizer: Auth
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - '*'
 
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler

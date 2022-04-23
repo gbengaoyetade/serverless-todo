@@ -9,7 +9,7 @@ const logger = createLogger('TodosAccess');
 const docClient: DocumentClient = new AWS.DynamoDB.DocumentClient();
 const s3Client = new XAWS.S3({ signatureVersion: 'v4' });
 const todosTable = process.env.TODOS_TABLE;
-const s3BucketName = process.env.S3_BUCKET_NAME;
+const s3BucketName = process.env.S3_BUCKET;
 const userIdIndex = process.env.INDEX_NAME;
 
 export const generateUploadUrl = async (todoId: string): Promise<string> => {
@@ -63,5 +63,32 @@ export const deleteTodo = async (todoId, userId) => {
     })
     .promise();
   console.log('Deleted', response.toString());
+  return true;
+};
+
+export const updateTodo = async (todoId, userId, updatedTodo) => {
+  const response = await docClient
+    .update({
+      TableName: todosTable,
+      Key: {
+        todoId,
+        userId,
+      },
+      UpdateExpression: 'set #name = :n, #dueDate = :due, #done = :d',
+      ExpressionAttributeValues: {
+        ':n': updatedTodo.name,
+        ':due': updatedTodo.dueDate,
+        ':d': updatedTodo.done,
+      },
+      ExpressionAttributeNames: {
+        '#name': 'name',
+        '#dueDate': 'dueDate',
+        '#done': 'done',
+      },
+    })
+    .promise();
+
+  console.log('updated response ', JSON.stringify(response));
+
   return true;
 };

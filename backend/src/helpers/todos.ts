@@ -3,6 +3,7 @@ import * as uuid from 'uuid';
 import * as todosAccess from './todosAccess';
 import { TodoItem } from '../models/TodoItem';
 import { CreateTodoRequest } from '../requests/CreateTodoRequest';
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest';
 import { getUserId } from '../lambda/utils';
 
 const s3BucketName = process.env.S3_BUCKET;
@@ -40,4 +41,16 @@ export async function deleteTodo(event: APIGatewayProxyEvent) {
   const userId = getUserId(event);
 
   return await todosAccess.deleteTodo(todoId, userId);
+}
+
+export async function updateTodo(
+  event: APIGatewayProxyEvent,
+  updateTodoRequest: UpdateTodoRequest
+) {
+  const todoId = event.pathParameters.todoId;
+  const userId = getUserId(event);
+
+  await todosAccess.updateTodo(todoId, userId, updateTodoRequest);
+
+  return true;
 }
