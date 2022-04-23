@@ -25,14 +25,14 @@ export const generateUploadUrl = async (todoId: string): Promise<string> => {
 };
 
 export const createTodo = async (todoItem: TodoItem): Promise<TodoItem> => {
-  logger.info(`creating todoItem ${todoItem.toString()}`);
+  logger.info(`creating todoItem with id: ${todoItem.todoId}`);
+
   const params = {
     TableName: todosTable,
     Item: todoItem,
   };
 
-  const result = await docClient.put(params).promise();
-  logger.info(result);
+  await docClient.put(params).promise();
 
   return todoItem as TodoItem;
 };
@@ -52,8 +52,8 @@ export const getTodos = async (userId) => {
   return result.Items;
 };
 
-export const deleteTodo = async (todoId, userId) => {
-  const response = await docClient
+export const deleteTodo = async (todoId: string, userId: string) => {
+  await docClient
     .delete({
       TableName: todosTable,
       Key: {
@@ -62,12 +62,24 @@ export const deleteTodo = async (todoId, userId) => {
       },
     })
     .promise();
-  console.log('Deleted', response.toString());
-  return true;
+};
+
+export const getTodo = async (todoId: string, userId: string) => {
+  const response = await docClient
+    .get({
+      TableName: todosTable,
+      Key: {
+        todoId,
+        userId,
+      },
+    })
+    .promise();
+
+  return response.Item;
 };
 
 export const updateTodo = async (todoId, userId, updatedTodo) => {
-  const response = await docClient
+  return await docClient
     .update({
       TableName: todosTable,
       Key: {
@@ -87,8 +99,4 @@ export const updateTodo = async (todoId, userId, updatedTodo) => {
       },
     })
     .promise();
-
-  console.log('updated response ', JSON.stringify(response));
-
-  return true;
 };

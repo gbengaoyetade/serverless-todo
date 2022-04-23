@@ -40,7 +40,14 @@ export async function deleteTodo(event: APIGatewayProxyEvent) {
   const todoId = event.pathParameters.todoId;
   const userId = getUserId(event);
 
-  return await todosAccess.deleteTodo(todoId, userId);
+  const getTodoResponse = await todosAccess.getTodo(todoId, userId);
+
+  if (!getTodoResponse) {
+    return false;
+  }
+
+  await todosAccess.deleteTodo(todoId, userId);
+  return true;
 }
 
 export async function updateTodo(

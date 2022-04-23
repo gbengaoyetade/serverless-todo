@@ -15,6 +15,7 @@ export const handler: APIGatewayProxyHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   if (!(await deleteTodo(event))) {
     logger.info('Item cannot be seen');
+
     return {
       statusCode: 404,
       body: JSON.stringify({

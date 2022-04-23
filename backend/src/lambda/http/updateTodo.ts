@@ -9,13 +9,16 @@ import { createLogger } from '../../utils/logger';
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest';
 import { updateTodo } from '../../helpers/todos';
 
+const logger = createLogger('updateTodo');
+
 export const handler: APIGatewayProxyHandler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const updatedTodo: UpdateTodoRequest = JSON.parse(event.body);
-  const logger = createLogger('auth');
-  const updated = await updateTodo(event, updatedTodo);
   logger.info('updating a todo item...');
+
+  const updatePayload: UpdateTodoRequest = JSON.parse(event.body);
+  const updated = await updateTodo(event, updatePayload);
+
   if (!updated) {
     return {
       statusCode: 404,

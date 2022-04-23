@@ -9,9 +9,6 @@ import { JwtPayload } from '../../auth/JwtPayload';
 
 const logger = createLogger('auth');
 
-// TODO: Provide a URL that can be used to download a certificate that can be used
-// to verify JWT token signature.
-// To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
 const jwksUrl = 'https://dev-mo9bzlrz.us.auth0.com/.well-known/jwks.json';
 
 export const handler = async (
@@ -65,14 +62,15 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const response = await Axios.get(jwksUrl);
   const jwks = response.data;
   const keys: any[] = jwks.keys;
+
   const signingKeys = keys
     .filter(
       (key) =>
-        key.use === 'sig' && // JWK property `use` determines the JWK is for signing
-        key.kty === 'RSA' && // We are only supporting RSA
-        key.kid && // The `kid` must be present to be useful for later
+        key.use === 'sig' &&
+        key.kty === 'RSA' &&
+        key.kid &&
         key.x5c &&
-        key.x5c.length // Has useful public keys (we aren't using n or e)
+        key.x5c.length
     )
     .map((key) => {
       return { kid: key.kid, nbf: key.nbf, x5c: key.x5c[0] };

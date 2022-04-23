@@ -1,13 +1,16 @@
 import 'source-map-support/register';
-
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as middy from 'middy';
 
 import { getTodos } from '../../helpers/todos';
+import { createLogger } from '../../utils/logger';
+
+const logger = createLogger('getTodos');
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    console.log('Getting todos...');
+    logger.info('Getting todos...');
+
     return {
       statusCode: 200,
       headers: {
